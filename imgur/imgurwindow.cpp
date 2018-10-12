@@ -79,7 +79,7 @@ ImgurWindow::ImgurWindow(QWidget* const /*parent*/)
      * | <Not logged in> |
      * |     Forget      | */
 
-    auto* userLabelLabel = new QLabel(i18n("Logged in as:"));
+    auto* userLabelLabel = new QLabel(i18n("Custom Logged in as:"));
     userLabelLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     userLabelLabel->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
 
@@ -97,7 +97,7 @@ ImgurWindow::ImgurWindow(QWidget* const /*parent*/)
     authLayout->insertStretch(-1, 1);
 
     /* Add anonymous upload button */
-    uploadAnonButton = new QPushButton(i18n("Upload Anonymously"));
+    uploadAnonButton = new QPushButton(i18n("Custom Upload Anonymously"));
     addButton(uploadAnonButton, QDialogButtonBox::ApplyRole);
 
     /* Connect UI signals */
