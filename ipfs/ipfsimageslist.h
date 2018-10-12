@@ -35,12 +35,12 @@
 using namespace KIPI;
 using namespace KIPIPlugins;
 
-namespace KIPIImgurPlugin
+namespace KIPIIPFSPlugin
 {
 
-class ImgurImageListViewItem;
+class IPFSImageListViewItem;
 
-class ImgurImagesList : public KPImagesList
+class IPFSImagesList : public KPImagesList
 {
     Q_OBJECT
 
@@ -53,24 +53,24 @@ public:
         URL             = KPImagesListView::User3,
     };
 
-    ImgurImagesList(QWidget* const parent = 0);
-    ~ImgurImagesList() override {}
+    IPFSImagesList(QWidget* const parent = 0);
+    ~IPFSImagesList() override {}
 
-    QList<const ImgurImageListViewItem*> getPendingItems();
+    QList<const IPFSImageListViewItem*> getPendingItems();
 
 public Q_SLOTS:
     void slotAddImages(const QList<QUrl>& list) override;
-    void slotSuccess(const ImgurAPI3Result& result);
+    void slotSuccess(const IPFSGLOBALUPLOADAPIResult& result);
     void slotDoubleClick(QTreeWidgetItem* element, int i);
 };
 
 // -------------------------------------------------------------------------
 
-class ImgurImageListViewItem : public KPImagesListViewItem
+class IPFSImageListViewItem : public KPImagesListViewItem
 {
 public:
-    ImgurImageListViewItem(KPImagesListView* const view, const QUrl& url);
-    ~ImgurImageListViewItem() override {}
+    IPFSImageListViewItem(KPImagesListView* const view, const QUrl& url);
+    ~IPFSImageListViewItem() override {}
 
     void setTitle(const QString& str);
     QString Title() const;
@@ -78,11 +78,11 @@ public:
     void setDescription(const QString& str);
     QString Description() const;
 
-    void setImgurUrl(const QString& str);
-    QString ImgurUrl() const;
+    void setIPFSUrl(const QString& str);
+    QString IPFSUrl() const;
 
 };
 
-} // namespace KIPIImgurPlugin
+} // namespace KIPIIPFSPlugin
 
 #endif // IMGURIMAGESLIST_H

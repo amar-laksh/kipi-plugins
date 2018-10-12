@@ -4,7 +4,7 @@
  *
  *
  * Date        : 2016-06-06
- * Description : a kipi plugin to export images to the Imgur web service
+ * Description : a kipi plugin to export images to the IPFS web service
  *
  * Copyright (C) 2010-2012 by Marius Orcsik <marius at habarnam dot ro>
  * Copyright (C) 2016 by Fabian Vogt <fabian at ritter dash vogt dot de>
@@ -48,23 +48,23 @@
 static const constexpr char *IMGUR_CLIENT_ID("bd2572bce74b73d"),
                             *IMGUR_CLIENT_SECRET("300988683e99cb7b203a5889cf71de9ac891c1c1");
 
-namespace KIPIImgurPlugin
+namespace KIPIIPFSPlugin
 {
 
-ImgurWindow::ImgurWindow(QWidget* const /*parent*/)
+IPFSWindow::IPFSWindow(QWidget* const /*parent*/)
     : KPToolDialog(0)
 {
-    api = new ImgurAPI3(QString::fromLatin1(IMGUR_CLIENT_ID),
+    api = new IPFSGLOBALUPLOADAPI(QString::fromLatin1(IMGUR_CLIENT_ID),
                         QString::fromLatin1(IMGUR_CLIENT_SECRET), this);
 
     /* Connect API signals */
-    connect(api, &ImgurAPI3::authorized, this, &ImgurWindow::apiAuthorized);
-    connect(api, &ImgurAPI3::authError,  this, &ImgurWindow::apiAuthError);
-    connect(api, &ImgurAPI3::progress,   this, &ImgurWindow::apiProgress);
-    connect(api, &ImgurAPI3::requestPin, this, &ImgurWindow::apiRequestPin);
-    connect(api, &ImgurAPI3::success,    this, &ImgurWindow::apiSuccess);
-    connect(api, &ImgurAPI3::error,      this, &ImgurWindow::apiError);
-    connect(api, &ImgurAPI3::busy,       this, &ImgurWindow::apiBusy);
+    connect(api, &IPFSGLOBALUPLOADAPI::authorized, this, &IPFSWindow::apiAuthorized);
+    connect(api, &IPFSGLOBALUPLOADAPI::authError,  this, &IPFSWindow::apiAuthError);
+    connect(api, &IPFSGLOBALUPLOADAPI::progress,   this, &IPFSWindow::apiProgress);
+    connect(api, &IPFSGLOBALUPLOADAPI::requestPin, this, &IPFSWindow::apiRequestPin);
+    connect(api, &IPFSGLOBALUPLOADAPI::success,    this, &IPFSWindow::apiSuccess);
+    connect(api, &IPFSGLOBALUPLOADAPI::error,      this, &IPFSWindow::apiError);
+    connect(api, &IPFSGLOBALUPLOADAPI::busy,       this, &IPFSWindow::apiBusy);
 
     /* | List | Auth | */
     auto* mainLayout = new QHBoxLayout;
@@ -72,7 +72,7 @@ ImgurWindow::ImgurWindow(QWidget* const /*parent*/)
     mainWidget->setLayout(mainLayout);
     this->setMainWidget(mainWidget);
 
-    this->list = new ImgurImagesList;
+    this->list = new IPFSImagesList;
     mainLayout->addWidget(list);
 
     /* |  Logged in as:  |
@@ -102,28 +102,28 @@ ImgurWindow::ImgurWindow(QWidget* const /*parent*/)
 
     /* Connect UI signals */
     connect(forgetButton, &QPushButton::clicked,
-            this, &ImgurWindow::forgetButtonClicked);
+            this, &IPFSWindow::forgetButtonClicked);
     connect(startButton(), &QPushButton::clicked,
-            this, &ImgurWindow::slotUpload);
+            this, &IPFSWindow::slotUpload);
     connect(uploadAnonButton, &QPushButton::clicked,
-            this, &ImgurWindow::slotAnonUpload);
-    connect(this, &ImgurWindow::finished,
-            this, &ImgurWindow::slotFinished);
-    connect(this, &ImgurWindow::cancelClicked,
-            this, &ImgurWindow::slotCancel);
+            this, &IPFSWindow::slotAnonUpload);
+    connect(this, &IPFSWindow::finished,
+            this, &IPFSWindow::slotFinished);
+    connect(this, &IPFSWindow::cancelClicked,
+            this, &IPFSWindow::slotCancel);
 
     setWindowIcon(QIcon::fromTheme(QString::fromLatin1("kipi-ipfs")));
-    setWindowTitle(i18n("Export to ipfs.com"));
+    setWindowTitle(i18n("Export to IPFS"));
     setModal(false);
 
     startButton()->setText(i18n("Upload"));
-    startButton()->setToolTip(i18n("Start upload to Imgur"));
+    startButton()->setToolTip(i18n("Start upload to IPFS"));
     startButton()->setEnabled(true);
 
     /* Add about data */
 
-    KPAboutData* const about = new KPAboutData(ki18n("Imgur Export"),
-                                   ki18n("A tool to export images to Imgur web service"),
+    KPAboutData* const about = new KPAboutData(ki18n("IPFS Export"),
+                                   ki18n("A tool to export images to IPFS web service"),
                                    ki18n("(c) 2012-2013, Marius Orcsik"));
 
     about->addAuthor(ki18n("Marius Orcsik").toString(),
@@ -146,32 +146,32 @@ ImgurWindow::ImgurWindow(QWidget* const /*parent*/)
     readSettings();
 }
 
-ImgurWindow::~ImgurWindow()
+IPFSWindow::~IPFSWindow()
 {
     saveSettings();
 }
 
-void ImgurWindow::reactivate()
+void IPFSWindow::reactivate()
 {
     list->loadImagesFromCurrentSelection();
     show();
 }
 
-void ImgurWindow::forgetButtonClicked()
+void IPFSWindow::forgetButtonClicked()
 {
     api->getAuth().unlink();
 
     apiAuthorized(false, {});
 }
 
-void ImgurWindow::slotUpload()
+void IPFSWindow::slotUpload()
 {
-    QList<const ImgurImageListViewItem*> pending = this->list->getPendingItems();
+    QList<const IPFSImageListViewItem*> pending = this->list->getPendingItems();
 
     for (auto item : pending)
     {
-        ImgurAPI3Action action;
-        action.type = ImgurAPI3ActionType::IMG_UPLOAD;
+        IPFSGLOBALUPLOADAPIAction action;
+        action.type = IPFSGLOBALUPLOADAPIActionType::IMG_UPLOAD;
         action.upload.imgpath = item->url().toLocalFile();
         action.upload.title = item->Title();
         action.upload.description = item->Description();
@@ -180,14 +180,14 @@ void ImgurWindow::slotUpload()
     }
 }
 
-void ImgurWindow::slotAnonUpload()
+void IPFSWindow::slotAnonUpload()
 {
-    QList<const ImgurImageListViewItem*> pending = this->list->getPendingItems();
+    QList<const IPFSImageListViewItem*> pending = this->list->getPendingItems();
 
     for (auto item : pending)
     {
-        ImgurAPI3Action action;
-        action.type = ImgurAPI3ActionType::ANON_IMG_UPLOAD;
+        IPFSGLOBALUPLOADAPIAction action;
+        action.type = IPFSGLOBALUPLOADAPIActionType::ANON_IMG_UPLOAD;
         action.upload.imgpath = item->url().toLocalFile();
         action.upload.title = item->Title();
         action.upload.description = item->Description();
@@ -196,17 +196,17 @@ void ImgurWindow::slotAnonUpload()
     }
 }
 
-void ImgurWindow::slotFinished()
+void IPFSWindow::slotFinished()
 {
     saveSettings();
 }
 
-void ImgurWindow::slotCancel()
+void IPFSWindow::slotCancel()
 {
     api->cancelAllWork();
 }
 
-void ImgurWindow::apiAuthorized(bool success, const QString& username)
+void IPFSWindow::apiAuthorized(bool success, const QString& username)
 {
     if (success)
     {
@@ -221,29 +221,29 @@ void ImgurWindow::apiAuthorized(bool success, const QString& username)
     this->forgetButton->setEnabled(false);
 }
 
-void ImgurWindow::apiAuthError(const QString& msg)
+void IPFSWindow::apiAuthError(const QString& msg)
 {
     QMessageBox::critical(this,
                           i18n("Authorization Failed"),
-                          i18n("Failed to log into Imgur: %1\n", msg));
+                          i18n("Failed to log into IPFS: %1\n", msg));
 }
 
-void ImgurWindow::apiProgress(unsigned int /*percent*/, const ImgurAPI3Action& action)
+void IPFSWindow::apiProgress(unsigned int /*percent*/, const IPFSGLOBALUPLOADAPIAction& action)
 {
     list->processing(QUrl::fromLocalFile(action.upload.imgpath));
 }
 
-void ImgurWindow::apiRequestPin(const QUrl& url)
+void IPFSWindow::apiRequestPin(const QUrl& url)
 {
     QDesktopServices::openUrl(url);
 }
 
-void ImgurWindow::apiSuccess(const ImgurAPI3Result& result)
+void IPFSWindow::apiSuccess(const IPFSGLOBALUPLOADAPIResult& result)
 {
     list->slotSuccess(result);
 }
 
-void ImgurWindow::apiError(const QString& msg, const ImgurAPI3Action& action)
+void IPFSWindow::apiError(const QString& msg, const IPFSGLOBALUPLOADAPIAction& action)
 {
     list->processed(QUrl::fromLocalFile(action.upload.imgpath), false);
 
@@ -252,27 +252,27 @@ void ImgurWindow::apiError(const QString& msg, const ImgurAPI3Action& action)
     {
         QMessageBox::critical(this,
                               i18n("Uploading Failed"),
-                              i18n("Failed to upload photo to Imgur: %1\n", msg));
+                              i18n("Failed to upload photo to IPFS: %1\n", msg));
         return;
     }
 
     QMessageBox::StandardButton cont =
             QMessageBox::question(this,
                                   i18n("Uploading Failed"),
-                                  i18n("Failed to upload photo to Imgur: %1\n"
+                                  i18n("Failed to upload photo to IPFS: %1\n"
                                        "Do you want to continue?", msg));
 
     if (cont != QMessageBox::Yes)
         api->cancelAllWork();
 }
 
-void ImgurWindow::apiBusy(bool busy)
+void IPFSWindow::apiBusy(bool busy)
 {
     setCursor(busy ? Qt::WaitCursor : Qt::ArrowCursor);
     startButton()->setEnabled(!busy);
 }
 
-void ImgurWindow::closeEvent(QCloseEvent* e)
+void IPFSWindow::closeEvent(QCloseEvent* e)
 {
     if (!e)
         return;
@@ -281,28 +281,28 @@ void ImgurWindow::closeEvent(QCloseEvent* e)
     e->accept();
 }
 
-void ImgurWindow::readSettings()
+void IPFSWindow::readSettings()
 {
     KConfig config(QString::fromLatin1("kipirc"));
-    KConfigGroup groupAuth = config.group("Imgur Auth");
+    KConfigGroup groupAuth = config.group("IPFS Auth");
     username = groupAuth.readEntry("username", QString());
     apiAuthorized(!username.isEmpty(), username);
 
     winId();
-    KConfigGroup groupDialog = config.group("Imgur Dialog");
+    KConfigGroup groupDialog = config.group("IPFS Dialog");
     KWindowConfig::restoreWindowSize(windowHandle(), groupDialog);
     resize(windowHandle()->size());
 }
 
-void ImgurWindow::saveSettings()
+void IPFSWindow::saveSettings()
 {
     KConfig config(QString::fromLatin1("kipirc"));
-    KConfigGroup groupAuth = config.group("Imgur Auth");
+    KConfigGroup groupAuth = config.group("IPFS Auth");
     groupAuth.writeEntry("username", username);
 
-    KConfigGroup groupDialog = config.group("Imgur Dialog");
+    KConfigGroup groupDialog = config.group("IPFS Dialog");
     KWindowConfig::saveWindowSize(windowHandle(), groupDialog);
     config.sync();
 }
 
-} // namespace KIPIImgurPlugin
+} // namespace KIPIIPFSPlugin

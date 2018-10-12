@@ -44,12 +44,12 @@
 
 using namespace KIPIPlugins;
 
-namespace KIPIImgurPlugin
+namespace KIPIIPFSPlugin
 {
 
-K_PLUGIN_FACTORY( ImgurFactory, registerPlugin<Plugin_Imgur>(); )
+K_PLUGIN_FACTORY( IPFSFactory, registerPlugin<Plugin_IPFS>(); )
 
-class Plugin_Imgur::Private
+class Plugin_IPFS::Private
 {
 public:
 
@@ -60,26 +60,26 @@ public:
     }
 
     QAction*     actionExport;
-    ImgurWindow* winExport;
+    IPFSWindow* winExport;
 };
 
-Plugin_Imgur::Plugin_Imgur(QObject* const parent, const QVariantList& /*args*/)
-    : Plugin(parent, "Imgur"),
+Plugin_IPFS::Plugin_IPFS(QObject* const parent, const QVariantList& /*args*/)
+    : Plugin(parent, "IPFS"),
       d(new Private)
 {
-    qCDebug(KIPIPLUGINS_LOG) << "Imgur plugin loaded";
+    qCDebug(KIPIPLUGINS_LOG) << "IPFS plugin loaded";
 
     setUiBaseName("kipiplugin_ipfsui.rc");
     setupXML();
 }
 
-Plugin_Imgur::~Plugin_Imgur()
+Plugin_IPFS::~Plugin_IPFS()
 {
     delete d->winExport;
     delete d;
 }
 
-void Plugin_Imgur::setup(QWidget* const widget)
+void Plugin_IPFS::setup(QWidget* const widget)
 {
     d->winExport = 0;
 
@@ -94,7 +94,7 @@ void Plugin_Imgur::setup(QWidget* const widget)
     setupActions();
 }
 
-void Plugin_Imgur::setupActions()
+void Plugin_IPFS::setupActions()
 {
     setDefaultCategory(ExportPlugin);
 
@@ -108,12 +108,12 @@ void Plugin_Imgur::setupActions()
     addAction(QString::fromLatin1("ipfsexport"), d->actionExport);
 }
 
-void Plugin_Imgur::slotActivate()
+void Plugin_IPFS::slotActivate()
 {
     if (!d->winExport)
     {
         // We clean it up in the close button
-        d->winExport = new ImgurWindow(QApplication::activeWindow());
+        d->winExport = new IPFSWindow(QApplication::activeWindow());
     }
     else
     {
@@ -130,6 +130,6 @@ void Plugin_Imgur::slotActivate()
     qCDebug(KIPIPLUGINS_LOG) << "We have activated the ipfs exporter!";
 }
 
-} // namespace KIPIImgurPlugin
+} // namespace KIPIIPFSPlugin
 
 #include "plugin_ipfs.moc"

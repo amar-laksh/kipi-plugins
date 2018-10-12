@@ -4,7 +4,7 @@
  *
  *
  * Date        : 2012-02-12
- * Description : a kipi plugin to export images to the Imgur web service
+ * Description : a kipi plugin to export images to the IPFS web service
  *
  * Copyright (C) 2010-2012 by Marius Orcsik <marius at habarnam dot ro>
  *
@@ -46,16 +46,16 @@ namespace KIPI
 using namespace KIPI;
 using namespace KIPIPlugins;
 
-namespace KIPIImgurPlugin
+namespace KIPIIPFSPlugin
 {
 
-class ImgurWindow : public KPToolDialog
+class IPFSWindow : public KPToolDialog
 {
     Q_OBJECT
 
 public:
-    ImgurWindow(QWidget* const parent = 0);
-    ~ImgurWindow();
+    IPFSWindow(QWidget* const parent = 0);
+    ~IPFSWindow();
 
     void reactivate();
 
@@ -67,13 +67,13 @@ public Q_SLOTS:
     void slotFinished();
     void slotCancel();
 
-    /* ImgurAPI3 callbacks */
+    /* IPFSGLOBALUPLOADAPI callbacks */
     void apiAuthorized(bool success, const QString& username);
     void apiAuthError(const QString& msg);
-    void apiProgress(unsigned int percent, const ImgurAPI3Action& action);
+    void apiProgress(unsigned int percent, const IPFSGLOBALUPLOADAPIAction& action);
     void apiRequestPin(const QUrl& url);
-    void apiSuccess(const ImgurAPI3Result& result);
-    void apiError(const QString &msg, const ImgurAPI3Action& action);
+    void apiSuccess(const IPFSGLOBALUPLOADAPIResult& result);
+    void apiError(const QString &msg, const IPFSGLOBALUPLOADAPIAction& action);
     void apiBusy(bool busy);
 
 private:
@@ -83,8 +83,8 @@ private:
     void saveSettings();
 
 private:
-    ImgurImagesList* list = nullptr;
-    ImgurAPI3*       api  = nullptr;
+    IPFSImagesList* list = nullptr;
+    IPFSGLOBALUPLOADAPI*       api  = nullptr;
     QPushButton*     forgetButton = nullptr;
     QPushButton*     uploadAnonButton = nullptr;
     QLabel*          userLabel = nullptr;
@@ -93,6 +93,6 @@ private:
     QString          username;
 };
 
-} // namespace KIPIImgurPlugin
+} // namespace KIPIIPFSPlugin
 
 #endif /* IMGURWINDOW_H */

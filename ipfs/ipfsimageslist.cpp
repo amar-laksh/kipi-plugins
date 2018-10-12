@@ -44,10 +44,10 @@
 
 #include "kipiplugins_debug.h"
 
-namespace KIPIImgurPlugin
+namespace KIPIIPFSPlugin
 {
 
-ImgurImagesList::ImgurImagesList(QWidget* const parent)
+IPFSImagesList::IPFSImagesList(QWidget* const parent)
     : KPImagesList(parent)
 {
     setControlButtonsPlacement(KPImagesList::ControlButtonsBelow);
@@ -58,38 +58,38 @@ ImgurImagesList::ImgurImagesList(QWidget* const parent)
 
     list->setColumnLabel(KPImagesListView::Thumbnail, i18n("Thumbnail"));
 
-    list->setColumnLabel(static_cast<KIPIPlugins::KPImagesListView::ColumnType>(ImgurImagesList::Title),
+    list->setColumnLabel(static_cast<KIPIPlugins::KPImagesListView::ColumnType>(IPFSImagesList::Title),
                          i18n("Submission title"));
 
-    list->setColumnLabel(static_cast<KIPIPlugins::KPImagesListView::ColumnType>(ImgurImagesList::Description),
+    list->setColumnLabel(static_cast<KIPIPlugins::KPImagesListView::ColumnType>(IPFSImagesList::Description),
                          i18n("Submission description"));
 
-    list->setColumn(static_cast<KIPIPlugins::KPImagesListView::ColumnType>(ImgurImagesList::URL),
+    list->setColumn(static_cast<KIPIPlugins::KPImagesListView::ColumnType>(IPFSImagesList::URL),
                     i18n("IPFS URL"), true);
 
     connect(list, &KPImagesListView::itemDoubleClicked,
-            this, &ImgurImagesList::slotDoubleClick);
+            this, &IPFSImagesList::slotDoubleClick);
 }
 
-QList<const ImgurImageListViewItem*> ImgurImagesList::getPendingItems()
+QList<const IPFSImageListViewItem*> IPFSImagesList::getPendingItems()
 {
-    QList<const ImgurImageListViewItem*> ret;
+    QList<const IPFSImageListViewItem*> ret;
 
     for (unsigned int i = listView()->topLevelItemCount(); i--;)
     {
-        const auto* item = dynamic_cast<const ImgurImageListViewItem*>(listView()->topLevelItem(i));
+        const auto* item = dynamic_cast<const IPFSImageListViewItem*>(listView()->topLevelItem(i));
 
-        if (item && item->ImgurUrl().isEmpty())
+        if (item && item->IPFSUrl().isEmpty())
             ret << item;
     }
 
     return ret;
 }
 
-void ImgurImagesList::slotAddImages(const QList<QUrl>& list)
+void IPFSImagesList::slotAddImages(const QList<QUrl>& list)
 {
     /* Replaces the KPImagesList::slotAddImages method, so that
-     * ImgurImageListViewItems can be added instead of ImagesListViewItems */
+     * IPFSImageListViewItems can be added instead of ImagesListViewItems */
 
     std::unique_ptr<MetadataProcessor> meta;
 
@@ -101,12 +101,12 @@ void ImgurImagesList::slotAddImages(const QList<QUrl>& list)
         // Already in the list?
         if (listView()->findItem(*it) == nullptr)
         {
-            auto* item = new ImgurImageListViewItem(listView(), *it);
+            auto* item = new IPFSImageListViewItem(listView(), *it);
 
             // Load URLs from meta data, if possible
             if (meta && meta->load(*it))
             {
-                item->setImgurUrl(meta->getXmpTagString(QLatin1String("Xmp.kipi.ImgurId")));
+                item->setIPFSUrl(meta->getXmpTagString(QLatin1String("Xmp.kipi.IPFSId")));
             }
         }
     }
@@ -115,7 +115,7 @@ void ImgurImagesList::slotAddImages(const QList<QUrl>& list)
     emit signalAddItems(list);
 }
 
-void ImgurImagesList::slotSuccess(const ImgurAPI3Result& result)
+void IPFSImagesList::slotSuccess(const IPFSGLOBALUPLOADAPIResult& result)
 {
     QUrl ipfsl = QUrl::fromLocalFile(result.action->upload.imgpath);
 
@@ -130,22 +130,22 @@ void ImgurImagesList::slotSuccess(const ImgurAPI3Result& result)
         // Save URLs to meta data, if possible
         if (meta && meta->load(ipfsl))
         {
-            meta->setXmpTagString(QLatin1String("Xmp.kipi.ImgurId"),         result.image.url);
+            meta->setXmpTagString(QLatin1String("Xmp.kipi.IPFSId"),         result.image.url);
             bool saved = meta->applyChanges();
             qCDebug(KIPIPLUGINS_LOG) << "Metadata" << (saved ? "Saved" : "Not Saved") << "to" << ipfsl;
         }
     }
 
-    ImgurImageListViewItem* const currItem = dynamic_cast<ImgurImageListViewItem*>(listView()->findItem(ipfsl));
+    IPFSImageListViewItem* const currItem = dynamic_cast<IPFSImageListViewItem*>(listView()->findItem(ipfsl));
 
     if (!currItem)
         return;
 
     if (!result.image.url.isEmpty())
-        currItem->setImgurUrl(result.image.url);
+        currItem->setIPFSUrl(result.image.url);
 }
 
-void ImgurImagesList::slotDoubleClick(QTreeWidgetItem* element, int i)
+void IPFSImagesList::slotDoubleClick(QTreeWidgetItem* element, int i)
 {
     if (i == URL )
     {
@@ -157,42 +157,42 @@ void ImgurImagesList::slotDoubleClick(QTreeWidgetItem* element, int i)
 
 // ------------------------------------------------------------------------------------------------
 
-ImgurImageListViewItem::ImgurImageListViewItem(KPImagesListView* const view, const QUrl& url)
+IPFSImageListViewItem::IPFSImageListViewItem(KPImagesListView* const view, const QUrl& url)
     : KPImagesListViewItem(view, url)
 {
     const QColor blue(50, 50, 255);
 
-    setTextColor(ImgurImagesList::URL, blue);
+    setTextColor(IPFSImagesList::URL, blue);
 }
 
-void ImgurImageListViewItem::setTitle(const QString& str)
+void IPFSImageListViewItem::setTitle(const QString& str)
 {
-    setText(ImgurImagesList::Title, str);
+    setText(IPFSImagesList::Title, str);
 }
 
-QString ImgurImageListViewItem::Title() const
+QString IPFSImageListViewItem::Title() const
 {
-    return text(ImgurImagesList::Title);
+    return text(IPFSImagesList::Title);
 }
 
-void ImgurImageListViewItem::setDescription(const QString& str)
+void IPFSImageListViewItem::setDescription(const QString& str)
 {
-    setText(ImgurImagesList::Description, str);
+    setText(IPFSImagesList::Description, str);
 }
 
-QString ImgurImageListViewItem::Description() const
+QString IPFSImageListViewItem::Description() const
 {
-    return text(ImgurImagesList::Description);
+    return text(IPFSImagesList::Description);
 }
 
-void ImgurImageListViewItem::setImgurUrl(const QString& str)
+void IPFSImageListViewItem::setIPFSUrl(const QString& str)
 {
-    setText(ImgurImagesList::URL, str);
+    setText(IPFSImagesList::URL, str);
 }
 
-QString ImgurImageListViewItem::ImgurUrl() const
+QString IPFSImageListViewItem::IPFSUrl() const
 {
-    return text(ImgurImagesList::URL);
+    return text(IPFSImagesList::URL);
 }
 
-} // namespace KIPIImgurPlugin
+} // namespace KIPIIPFSPlugin

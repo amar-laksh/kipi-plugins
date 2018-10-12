@@ -4,7 +4,7 @@
  *
  *
  * Date        : 2016-05-27
- * Description : Implementation of v3 of the Imgur API
+ * Description : Implementation of v3 of the IPFS API
  *
  * Copyright (C) 2016 by Fabian Vogt <fabian at ritter dash vogt dot de>
  *
@@ -46,7 +46,7 @@ static const QString ipfs_auth_url = QLatin1String("https://api.ipfs.com/oauth2/
 ipfs_token_url = QLatin1String("https://api.ipfs.com/oauth2/token");
 static const uint16_t ipfs_redirect_port = 8000; // Redirect URI is http://127.0.0.1:8000
 
-ImgurAPI3::ImgurAPI3(const QString& client_id, const QString& client_secret, QObject* parent)
+IPFSGLOBALUPLOADAPI::IPFSGLOBALUPLOADAPI(const QString& client_id, const QString& client_secret, QObject* parent)
     : QObject(parent)
 {
     m_auth.setClientId(client_id);
@@ -61,38 +61,38 @@ ImgurAPI3::ImgurAPI3(const QString& client_id, const QString& client_secret, QOb
 
     QSettings* const settings    = new QSettings(kipioauth, QSettings::IniFormat, this);
     O0SettingsStore* const store = new O0SettingsStore(settings, QLatin1String(O2_ENCRYPTION_KEY), this);
-    store->setGroupKey(QLatin1String("Imgur"));
+    store->setGroupKey(QLatin1String("IPFS"));
     m_auth.setStore(store);
 
-    connect(&m_auth, &O2::linkedChanged, this, &ImgurAPI3::oauthAuthorized);
-    connect(&m_auth, &O2::openBrowser,   this, &ImgurAPI3::oauthRequestPin);
-    connect(&m_auth, &O2::linkingFailed, this, &ImgurAPI3::oauthFailed);
+    connect(&m_auth, &O2::linkedChanged, this, &IPFSGLOBALUPLOADAPI::oauthAuthorized);
+    connect(&m_auth, &O2::openBrowser,   this, &IPFSGLOBALUPLOADAPI::oauthRequestPin);
+    connect(&m_auth, &O2::linkingFailed, this, &IPFSGLOBALUPLOADAPI::oauthFailed);
 }
 
-ImgurAPI3::~ImgurAPI3()
+IPFSGLOBALUPLOADAPI::~IPFSGLOBALUPLOADAPI()
 {
     /* Disconnect all signals as cancelAllWork may emit */
     disconnect(this, 0, 0, 0);
     cancelAllWork();
 }
 
-O2 &ImgurAPI3::getAuth()
+O2 &IPFSGLOBALUPLOADAPI::getAuth()
 {
     return m_auth;
 }
 
-unsigned int ImgurAPI3::workQueueLength()
+unsigned int IPFSGLOBALUPLOADAPI::workQueueLength()
 {
     return m_work_queue.size();
 }
 
-void ImgurAPI3::queueWork(const ImgurAPI3Action& action)
+void IPFSGLOBALUPLOADAPI::queueWork(const IPFSGLOBALUPLOADAPIAction& action)
 {
     m_work_queue.push(action);
     startWorkTimer();
 }
 
-void ImgurAPI3::cancelAllWork()
+void IPFSGLOBALUPLOADAPI::cancelAllWork()
 {
     stopWorkTimer();
 
@@ -104,12 +104,12 @@ void ImgurAPI3::cancelAllWork()
         m_work_queue.pop();
 }
 
-QUrl ImgurAPI3::urlForDeletehash(const QString& deletehash)
+QUrl IPFSGLOBALUPLOADAPI::urlForDeletehash(const QString& deletehash)
 {
     return QUrl{QLatin1String("https://ipfs.com/delete/") + deletehash};
 }
 
-void ImgurAPI3::oauthAuthorized()
+void IPFSGLOBALUPLOADAPI::oauthAuthorized()
 {
     bool success = m_auth.linked();
 
@@ -121,24 +121,24 @@ void ImgurAPI3::oauthAuthorized()
     emit authorized(success, m_auth.extraTokens()[QLatin1String("account_username")].toString());
 }
 
-void ImgurAPI3::oauthRequestPin(const QUrl& url)
+void IPFSGLOBALUPLOADAPI::oauthRequestPin(const QUrl& url)
 {
     emit busy(false);
     emit requestPin(url);
 }
 
-void ImgurAPI3::oauthFailed()
+void IPFSGLOBALUPLOADAPI::oauthFailed()
 {
     emit authError(i18n("Could not authorize"));
 }
 
-void ImgurAPI3::uploadProgress(qint64 sent, qint64 total)
+void IPFSGLOBALUPLOADAPI::uploadProgress(qint64 sent, qint64 total)
 {
     if (total > 0) /* Don't divide by 0 */
         emit progress((sent * 100) / total, m_work_queue.front());
 }
 
-void ImgurAPI3::replyFinished()
+void IPFSGLOBALUPLOADAPI::replyFinished()
 {
     auto* reply = m_reply;
     reply->deleteLater();
@@ -163,14 +163,14 @@ void ImgurAPI3::replyFinished()
     if (code == 200 && !response.isEmpty())
     {
         /* Success! */
-        ImgurAPI3Result result;
+        IPFSGLOBALUPLOADAPIResult result;
         result.action = &m_work_queue.front();
         auto data = response.object()[QLatin1String("data")].toObject();
 
         switch (result.action->type)
         {
-            case ImgurAPI3ActionType::IMG_UPLOAD:
-            case ImgurAPI3ActionType::ANON_IMG_UPLOAD:
+            case IPFSGLOBALUPLOADAPIActionType::IMG_UPLOAD:
+            case IPFSGLOBALUPLOADAPIActionType::ANON_IMG_UPLOAD:
                 result.image.animated = data[QLatin1String("animated")].toBool();
                 result.image.bandwidth = data[QLatin1String("bandwidth")].toInt();
                 result.image.datetime = data[QLatin1String("datetime")].toInt();
@@ -186,7 +186,7 @@ void ImgurAPI3::replyFinished()
                 result.image.views = data[QLatin1String("views")].toInt();
                 result.image.width = data[QLatin1String("width")].toInt();
                 break;
-            case ImgurAPI3ActionType::ACCT_INFO:
+            case IPFSGLOBALUPLOADAPIActionType::ACCT_INFO:
                 result.account.username = data[QLatin1String("url")].toString();
                 /* TODO: Other fields */
                 break;
@@ -225,7 +225,7 @@ void ImgurAPI3::replyFinished()
     startWorkTimer();
 }
 
-void ImgurAPI3::timerEvent(QTimerEvent* event)
+void IPFSGLOBALUPLOADAPI::timerEvent(QTimerEvent* event)
 {
     if (event->timerId() != m_work_timer)
         return QObject::timerEvent(event);
@@ -239,7 +239,7 @@ void ImgurAPI3::timerEvent(QTimerEvent* event)
     doWork();
 }
 
-void ImgurAPI3::startWorkTimer()
+void IPFSGLOBALUPLOADAPI::startWorkTimer()
 {
     if (!m_work_queue.empty() && m_work_timer == 0)
     {
@@ -250,7 +250,7 @@ void ImgurAPI3::startWorkTimer()
         emit busy(false);
 }
 
-void ImgurAPI3::stopWorkTimer()
+void IPFSGLOBALUPLOADAPI::stopWorkTimer()
 {
     if (m_work_timer != 0)
     {
@@ -259,26 +259,26 @@ void ImgurAPI3::stopWorkTimer()
     }
 }
 
-void ImgurAPI3::addAuthToken(QNetworkRequest* request)
+void IPFSGLOBALUPLOADAPI::addAuthToken(QNetworkRequest* request)
 {
     request->setRawHeader(QByteArray("Authorization"),
                           QString::fromLatin1("Bearer %1").arg(m_auth.token()).toUtf8());
 }
 
-void ImgurAPI3::addAnonToken(QNetworkRequest* request)
+void IPFSGLOBALUPLOADAPI::addAnonToken(QNetworkRequest* request)
 {
     request->setRawHeader(QByteArray("Authorization"),
                           QString::fromLatin1("Client-ID %1").arg(m_auth.clientId()).toUtf8());
 }
 
-void ImgurAPI3::doWork()
+void IPFSGLOBALUPLOADAPI::doWork()
 {
     if (m_work_queue.empty() || m_reply != nullptr)
         return;
 
     auto &work = m_work_queue.front();
 
-    if (work.type != ImgurAPI3ActionType::ANON_IMG_UPLOAD && !m_auth.linked())
+    if (work.type != IPFSGLOBALUPLOADAPIActionType::ANON_IMG_UPLOAD && !m_auth.linked())
     {
         m_auth.link();
         return; /* Wait for the authorized() signal. */
@@ -286,7 +286,7 @@ void ImgurAPI3::doWork()
 
     switch(work.type)
     {
-        case ImgurAPI3ActionType::ACCT_INFO:
+        case IPFSGLOBALUPLOADAPIActionType::ACCT_INFO:
         {
             QNetworkRequest request(QUrl(QString::fromLatin1("https://api.ipfs.com/3/account/%1")
                                         .arg(QLatin1String(work.account.username.toUtf8().toPercentEncoding()))));
@@ -295,8 +295,8 @@ void ImgurAPI3::doWork()
             this->m_reply = m_net.get(request);
             break;
         }
-        case ImgurAPI3ActionType::ANON_IMG_UPLOAD:
-        case ImgurAPI3ActionType::IMG_UPLOAD:
+        case IPFSGLOBALUPLOADAPIActionType::ANON_IMG_UPLOAD:
+        case IPFSGLOBALUPLOADAPIActionType::IMG_UPLOAD:
         {
             this->m_image = new QFile(work.upload.imgpath);
 
@@ -336,7 +336,7 @@ void ImgurAPI3::doWork()
 
             QNetworkRequest request(QUrl(QLatin1String("https://api.ipfs.com/3/image")));
 
-            if (work.type == ImgurAPI3ActionType::IMG_UPLOAD)
+            if (work.type == IPFSGLOBALUPLOADAPIActionType::IMG_UPLOAD)
                 addAuthToken(&request);
             else
                 addAnonToken(&request);
@@ -349,7 +349,7 @@ void ImgurAPI3::doWork()
 
     if (this->m_reply)
     {
-        connect(m_reply, &QNetworkReply::uploadProgress, this, &ImgurAPI3::uploadProgress);
-        connect(m_reply, &QNetworkReply::finished, this, &ImgurAPI3::replyFinished);
+        connect(m_reply, &QNetworkReply::uploadProgress, this, &IPFSGLOBALUPLOADAPI::uploadProgress);
+        connect(m_reply, &QNetworkReply::finished, this, &IPFSGLOBALUPLOADAPI::replyFinished);
     }
 }

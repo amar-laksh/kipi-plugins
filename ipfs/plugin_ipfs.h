@@ -37,17 +37,17 @@
 
 using namespace KIPI;
 
-namespace KIPIImgurPlugin
+namespace KIPIIPFSPlugin
 {
 
-class Plugin_Imgur : public Plugin
+class Plugin_IPFS : public Plugin
 {
     Q_OBJECT
 
 public:
 
-    explicit Plugin_Imgur(QObject* const parent, const QVariantList& args);
-    ~Plugin_Imgur();
+    explicit Plugin_IPFS(QObject* const parent, const QVariantList& args);
+    ~Plugin_IPFS();
 
     void setup(QWidget* const) Q_DECL_OVERRIDE;
 
@@ -65,6 +65,6 @@ private:
     Private* const d;
 };
 
-} // namespace KIPIImgurPlugin
+} // namespace KIPIIPFSPlugin
 
 #endif // PLUGIN_IMGUREXPORT_H

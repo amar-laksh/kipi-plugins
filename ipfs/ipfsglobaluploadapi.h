@@ -4,7 +4,7 @@
  *
  *
  * Date        : 2016-05-27
- * Description : Implementation of v3 of the Imgur API
+ * Description : Implementation of v3 of the IPFS API
  *
  * Copyright (C) 2016 by Fabian Vogt <fabian at ritter dash vogt dot de>
  *
@@ -20,8 +20,8 @@
  *
  * ============================================================ */
 
-#ifndef IMGURAPI3_H
-#define IMGURAPI3_H
+#ifndef IMGURGLOBALUPLOADAPI_H
+#define IMGURGLOBALUPLOADAPI_H
 
 // C++ includes
 
@@ -39,16 +39,16 @@
 
 #include "o2.h"
 
-enum class ImgurAPI3ActionType
+enum class IPFSGLOBALUPLOADAPIActionType
 {
     ACCT_INFO, /* Action: account Result: account */
     IMG_UPLOAD, /* Action: upload Result: image */
     ANON_IMG_UPLOAD, /* Action: upload Result: image */
 };
 
-struct ImgurAPI3Action
+struct IPFSGLOBALUPLOADAPIAction
 {
-    ImgurAPI3ActionType type;
+    IPFSGLOBALUPLOADAPIActionType type;
     struct
     {
         QString imgpath;
@@ -62,11 +62,11 @@ struct ImgurAPI3Action
     } account;
 };
 
-struct ImgurAPI3Result
+struct IPFSGLOBALUPLOADAPIResult
 {
-    const ImgurAPI3Action* action;
+    const IPFSGLOBALUPLOADAPIAction* action;
 
-    struct ImgurImage
+    struct IPFSImage
     {
         QString    name;
         QString    title;
@@ -84,26 +84,26 @@ struct ImgurAPI3Result
         qulonglong bandwidth;
     } image;
 
-    struct ImgurAccount
+    struct IPFSAccount
     {
         QString username;
     } account;
 };
 
-/* Main class, handles the client side of the Imgur API v3. */
-class ImgurAPI3 : public QObject
+/* Main class, handles the client side of the IPFS API v3. */
+class IPFSGLOBALUPLOADAPI : public QObject
 {
 Q_OBJECT
 
 public:
-    ImgurAPI3(const QString& client_id, const QString& client_secret, QObject* parent = nullptr);
-    ~ImgurAPI3();
+    IPFSGLOBALUPLOADAPI(const QString& client_id, const QString& client_secret, QObject* parent = nullptr);
+    ~IPFSGLOBALUPLOADAPI();
 
     /* Use this to read/write the access and refresh tokens. */
     O2 &getAuth();
 
     unsigned int workQueueLength();
-    void queueWork(const ImgurAPI3Action& action);
+    void queueWork(const IPFSGLOBALUPLOADAPIAction& action);
     void cancelAllWork();
 
     static QUrl urlForDeletehash(const QString& deletehash);
@@ -118,9 +118,9 @@ Q_SIGNALS:
     void requestPin(const QUrl& url);
 
     /* Emitted on progress changes. */
-    void progress(unsigned int percent, const ImgurAPI3Action& action);
-    void success(const ImgurAPI3Result& result);
-    void error(const QString& msg, const ImgurAPI3Action& action);
+    void progress(unsigned int percent, const IPFSGLOBALUPLOADAPIAction& action);
+    void success(const IPFSGLOBALUPLOADAPIResult& result);
+    void error(const QString& msg, const IPFSGLOBALUPLOADAPIAction& action);
 
     /* Emitted when the status changes. */
     void busy(bool b);
@@ -158,7 +158,7 @@ private:
     O2 m_auth;
 
     /* Work queue. */
-    std::queue<ImgurAPI3Action> m_work_queue;
+    std::queue<IPFSGLOBALUPLOADAPIAction> m_work_queue;
     /* ID of timer triggering on idle (0ms). */
     int m_work_timer = 0;
 
@@ -172,4 +172,4 @@ private:
     QNetworkAccessManager m_net;
 };
 
-#endif // IMGURAPI3_H
+#endif // IMGURGLOBALUPLOADAPI_H
