@@ -51,7 +51,6 @@ public:
         Title           = KPImagesListView::User1,
         Description     = KPImagesListView::User2,
         URL             = KPImagesListView::User3,
-        DeleteURL       = KPImagesListView::User4
     };
 
     ImgurImagesList(QWidget* const parent = 0);
@@ -82,8 +81,6 @@ public:
     void setImgurUrl(const QString& str);
     QString ImgurUrl() const;
 
-    void setImgurDeleteUrl(const QString& str);
-    QString ImgurDeleteUrl() const;
 };
 
 } // namespace KIPIImgurPlugin

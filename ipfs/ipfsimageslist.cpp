@@ -65,10 +65,7 @@ ImgurImagesList::ImgurImagesList(QWidget* const parent)
                          i18n("Submission description"));
 
     list->setColumn(static_cast<KIPIPlugins::KPImagesListView::ColumnType>(ImgurImagesList::URL),
-                    i18n("Imgur URL"), true);
-
-    list->setColumn(static_cast<KIPIPlugins::KPImagesListView::ColumnType>(ImgurImagesList::DeleteURL),
-                    i18n("Imgur Delete URL"), true);
+                    i18n("IPFS URL"), true);
 
     connect(list, &KPImagesListView::itemDoubleClicked,
             this, &ImgurImagesList::slotDoubleClick);
@@ -110,7 +107,6 @@ void ImgurImagesList::slotAddImages(const QList<QUrl>& list)
             if (meta && meta->load(*it))
             {
                 item->setImgurUrl(meta->getXmpTagString(QLatin1String("Xmp.kipi.ImgurId")));
-                item->setImgurDeleteUrl(meta->getXmpTagString(QLatin1String("Xmp.kipi.ImgurDeleteHash")));
             }
         }
     }
@@ -135,7 +131,6 @@ void ImgurImagesList::slotSuccess(const ImgurAPI3Result& result)
         if (meta && meta->load(ipfsl))
         {
             meta->setXmpTagString(QLatin1String("Xmp.kipi.ImgurId"),         result.image.url);
-            meta->setXmpTagString(QLatin1String("Xmp.kipi.ImgurDeleteHash"), ImgurAPI3::urlForDeletehash(result.image.deletehash).toString());
             bool saved = meta->applyChanges();
             qCDebug(KIPIPLUGINS_LOG) << "Metadata" << (saved ? "Saved" : "Not Saved") << "to" << ipfsl;
         }
@@ -148,14 +143,11 @@ void ImgurImagesList::slotSuccess(const ImgurAPI3Result& result)
 
     if (!result.image.url.isEmpty())
         currItem->setImgurUrl(result.image.url);
-
-    if (!result.image.deletehash.isEmpty())
-        currItem->setImgurDeleteUrl(ImgurAPI3::urlForDeletehash(result.image.deletehash).toString());
 }
 
 void ImgurImagesList::slotDoubleClick(QTreeWidgetItem* element, int i)
 {
-    if (i == URL || i == DeleteURL)
+    if (i == URL )
     {
         const QUrl url = QUrl(element->text(i));
         // The delete page asks for confirmation, so we don't need to do that here
@@ -171,7 +163,6 @@ ImgurImageListViewItem::ImgurImageListViewItem(KPImagesListView* const view, con
     const QColor blue(50, 50, 255);
 
     setTextColor(ImgurImagesList::URL, blue);
-    setTextColor(ImgurImagesList::DeleteURL, blue);
 }
 
 void ImgurImageListViewItem::setTitle(const QString& str)
@@ -202,16 +193,6 @@ void ImgurImageListViewItem::setImgurUrl(const QString& str)
 QString ImgurImageListViewItem::ImgurUrl() const
 {
     return text(ImgurImagesList::URL);
-}
-
-void ImgurImageListViewItem::setImgurDeleteUrl(const QString& str)
-{
-    setText(ImgurImagesList::DeleteURL, str);
-}
-
-QString ImgurImageListViewItem::ImgurDeleteUrl() const
-{
-    return text(ImgurImagesList::DeleteURL);
 }
 
 } // namespace KIPIImgurPlugin
