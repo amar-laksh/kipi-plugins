@@ -10,7 +10,7 @@ add_definitions(-DTRANSLATION_DOMAIN=\"kipiplugin_ipfs\")
 
 set(kipiplugin_ipfs_PART_SRCS
     plugin_ipfs.cpp
-    ipfsglobalupload.cpp
+    ipfsglobaluploadapi.cpp
     ipfswindow.cpp
     ipfsimageslist.cpp
    )

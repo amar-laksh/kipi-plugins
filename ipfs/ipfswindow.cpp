@@ -21,7 +21,7 @@
  *
  * ============================================================ */
 
-#include "imgurwindow.h"
+#include "ipfswindow.h"
 
 // Qt includes
 
@@ -112,8 +112,8 @@ ImgurWindow::ImgurWindow(QWidget* const /*parent*/)
     connect(this, &ImgurWindow::cancelClicked,
             this, &ImgurWindow::slotCancel);
 
-    setWindowIcon(QIcon::fromTheme(QString::fromLatin1("kipi-imgur")));
-    setWindowTitle(i18n("Export to imgur.com"));
+    setWindowIcon(QIcon::fromTheme(QString::fromLatin1("kipi-ipfs")));
+    setWindowTitle(i18n("Export to ipfs.com"));
     setModal(false);
 
     startButton()->setText(i18n("Upload"));
@@ -138,7 +138,7 @@ ImgurWindow::ImgurWindow(QWidget* const /*parent*/)
                      ki18n("Developer").toString(),
                      QString::fromLatin1("fabian at ritter dash vogt dot de"));
 
-    about->setHandbookEntry(QString::fromLatin1("tool-imgurexport"));
+    about->setHandbookEntry(QString::fromLatin1("tool-ipfsexport"));
     setAboutData(about);
 
     /* Only used if not overwritten by readSettings() */

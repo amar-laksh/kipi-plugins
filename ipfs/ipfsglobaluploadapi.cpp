@@ -20,7 +20,7 @@
  *
  * ============================================================ */
 
-#include "imgurapi3.h"
+#include "ipfsglobaluploadapi.h"
 
 // Qt includes
 
@@ -42,19 +42,19 @@
 #include "o0settingsstore.h"
 #include "o0globals.h"
 
-static const QString imgur_auth_url = QLatin1String("https://api.imgur.com/oauth2/authorize"),
-imgur_token_url = QLatin1String("https://api.imgur.com/oauth2/token");
-static const uint16_t imgur_redirect_port = 8000; // Redirect URI is http://127.0.0.1:8000
+static const QString ipfs_auth_url = QLatin1String("https://api.ipfs.com/oauth2/authorize"),
+ipfs_token_url = QLatin1String("https://api.ipfs.com/oauth2/token");
+static const uint16_t ipfs_redirect_port = 8000; // Redirect URI is http://127.0.0.1:8000
 
 ImgurAPI3::ImgurAPI3(const QString& client_id, const QString& client_secret, QObject* parent)
     : QObject(parent)
 {
     m_auth.setClientId(client_id);
     m_auth.setClientSecret(client_secret);
-    m_auth.setRequestUrl(imgur_auth_url);
-    m_auth.setTokenUrl(imgur_token_url);
-    m_auth.setRefreshTokenUrl(imgur_token_url);
-    m_auth.setLocalPort(imgur_redirect_port);
+    m_auth.setRequestUrl(ipfs_auth_url);
+    m_auth.setTokenUrl(ipfs_token_url);
+    m_auth.setRefreshTokenUrl(ipfs_token_url);
+    m_auth.setLocalPort(ipfs_redirect_port);
     m_auth.setLocalhostPolicy(QString());
 
     QString kipioauth = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + QLatin1String("/kipioauthrc");
@@ -106,7 +106,7 @@ void ImgurAPI3::cancelAllWork()
 
 QUrl ImgurAPI3::urlForDeletehash(const QString& deletehash)
 {
-    return QUrl{QLatin1String("https://imgur.com/delete/") + deletehash};
+    return QUrl{QLatin1String("https://ipfs.com/delete/") + deletehash};
 }
 
 void ImgurAPI3::oauthAuthorized()
@@ -288,7 +288,7 @@ void ImgurAPI3::doWork()
     {
         case ImgurAPI3ActionType::ACCT_INFO:
         {
-            QNetworkRequest request(QUrl(QString::fromLatin1("https://api.imgur.com/3/account/%1")
+            QNetworkRequest request(QUrl(QString::fromLatin1("https://api.ipfs.com/3/account/%1")
                                         .arg(QLatin1String(work.account.username.toUtf8().toPercentEncoding()))));
             addAuthToken(&request);
 
@@ -334,7 +334,7 @@ void ImgurAPI3::doWork()
             image.setBodyDevice(this->m_image);
             multipart->append(image);
 
-            QNetworkRequest request(QUrl(QLatin1String("https://api.imgur.com/3/image")));
+            QNetworkRequest request(QUrl(QLatin1String("https://api.ipfs.com/3/image")));
 
             if (work.type == ImgurAPI3ActionType::IMG_UPLOAD)
                 addAuthToken(&request);

@@ -34,9 +34,9 @@
 
 // Local includes
 
-#include "imgurimageslist.h"
+#include "ipfsimageslist.h"
 #include "kptooldialog.h"
-#include "imgurapi3.h"
+#include "ipfsglobaluploadapi.h"
 
 namespace KIPI
 {
@@ -88,7 +88,7 @@ private:
     QPushButton*     forgetButton = nullptr;
     QPushButton*     uploadAnonButton = nullptr;
     QLabel*          userLabel = nullptr;
-    /* Contains the imgur username if API authorized.
+    /* Contains the ipfs username if API authorized.
      * If not, username is null. */
     QString          username;
 };

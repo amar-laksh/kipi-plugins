@@ -4,7 +4,7 @@
  * http://www.kipi-plugins.org
  *
  * Date        : 2010-02-04
- * Description : a tool to export images to imgur.com
+ * Description : a tool to export images to ipfs.com
  *
  * Copyright (C) 2010-2012 by Marius Orcsik <marius at habarnam dot ro>
  *
@@ -30,7 +30,7 @@
 // Local includes
 
 #include "kpimageslist.h"
-#include "imgurapi3.h"
+#include "ipfsglobaluploadapi.h"
 
 using namespace KIPI;
 using namespace KIPIPlugins;

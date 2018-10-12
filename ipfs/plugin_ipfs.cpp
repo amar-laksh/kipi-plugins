@@ -4,7 +4,7 @@
  * http://www.kipi-plugins.org
  *
  * Date        : 2010-02-04
- * Description : a tool to export images to imgur.com
+ * Description : a tool to export images to ipfs.com
  *
  * Copyright (C) 2010-2012 by Marius Orcsik <marius at habarnam dot ro>
  *
@@ -20,7 +20,7 @@
  *
  * ============================================================ */
 
-#include "plugin_imgur.h"
+#include "plugin_ipfs.h"
 
 // Qt includes
 
@@ -69,7 +69,7 @@ Plugin_Imgur::Plugin_Imgur(QObject* const parent, const QVariantList& /*args*/)
 {
     qCDebug(KIPIPLUGINS_LOG) << "Imgur plugin loaded";
 
-    setUiBaseName("kipiplugin_imgurui.rc");
+    setUiBaseName("kipiplugin_ipfsui.rc");
     setupXML();
 }
 
@@ -99,13 +99,13 @@ void Plugin_Imgur::setupActions()
     setDefaultCategory(ExportPlugin);
 
     d->actionExport = new QAction(this);
-    d->actionExport->setText(i18n("Export to &Imgur..."));
-    d->actionExport->setIcon(QIcon::fromTheme(QString::fromLatin1("kipi-imgur")));
+    d->actionExport->setText(i18n("Export to &IPFS..."));
+    d->actionExport->setIcon(QIcon::fromTheme(QString::fromLatin1("kipi-ipfs")));
 
     connect(d->actionExport, SIGNAL(triggered(bool)),
             this, SLOT(slotActivate()));
 
-    addAction(QString::fromLatin1("imgurexport"), d->actionExport);
+    addAction(QString::fromLatin1("ipfsexport"), d->actionExport);
 }
 
 void Plugin_Imgur::slotActivate()
@@ -127,9 +127,9 @@ void Plugin_Imgur::slotActivate()
 
     d->winExport->reactivate();
 
-    qCDebug(KIPIPLUGINS_LOG) << "We have activated the imgur exporter!";
+    qCDebug(KIPIPLUGINS_LOG) << "We have activated the ipfs exporter!";
 }
 
 } // namespace KIPIImgurPlugin
 
-#include "plugin_imgur.moc"
+#include "plugin_ipfs.moc"

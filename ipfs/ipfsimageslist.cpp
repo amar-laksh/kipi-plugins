@@ -4,7 +4,7 @@
  * http://www.kipi-plugins.org
  *
  * Date        : 2010-02-04
- * Description : a tool to export images to imgur.com
+ * Description : a tool to export images to ipfs.com
  *
  * Copyright (C) 2010-2012 by Marius Orcsik <marius at habarnam dot ro>
  *
@@ -20,7 +20,7 @@
  *
  * ============================================================ */
 
-#include "imgurimageslist.h"
+#include "ipfsimageslist.h"
 
 // C++ includes
 
@@ -121,9 +121,9 @@ void ImgurImagesList::slotAddImages(const QList<QUrl>& list)
 
 void ImgurImagesList::slotSuccess(const ImgurAPI3Result& result)
 {
-    QUrl imgurl = QUrl::fromLocalFile(result.action->upload.imgpath);
+    QUrl ipfsl = QUrl::fromLocalFile(result.action->upload.imgpath);
 
-    processed(imgurl, true);
+    processed(ipfsl, true);
 
     Interface* intf = iface();
 
@@ -132,16 +132,16 @@ void ImgurImagesList::slotSuccess(const ImgurAPI3Result& result)
         QPointer<MetadataProcessor> meta = intf->createMetadataProcessor();
 
         // Save URLs to meta data, if possible
-        if (meta && meta->load(imgurl))
+        if (meta && meta->load(ipfsl))
         {
             meta->setXmpTagString(QLatin1String("Xmp.kipi.ImgurId"),         result.image.url);
             meta->setXmpTagString(QLatin1String("Xmp.kipi.ImgurDeleteHash"), ImgurAPI3::urlForDeletehash(result.image.deletehash).toString());
             bool saved = meta->applyChanges();
-            qCDebug(KIPIPLUGINS_LOG) << "Metadata" << (saved ? "Saved" : "Not Saved") << "to" << imgurl;
+            qCDebug(KIPIPLUGINS_LOG) << "Metadata" << (saved ? "Saved" : "Not Saved") << "to" << ipfsl;
         }
     }
 
-    ImgurImageListViewItem* const currItem = dynamic_cast<ImgurImageListViewItem*>(listView()->findItem(imgurl));
+    ImgurImageListViewItem* const currItem = dynamic_cast<ImgurImageListViewItem*>(listView()->findItem(ipfsl));
 
     if (!currItem)
         return;
