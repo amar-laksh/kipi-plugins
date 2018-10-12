@@ -7,10 +7,10 @@
 
 ecm_install_icons(
     ICONS
-        16-apps-kipi-imgur.png
-        22-apps-kipi-imgur.png
-        32-apps-kipi-imgur.png
-        48-apps-kipi-imgur.png
-        sc-apps-kipi-imgur.svgz
+        16-apps-kipi-ipfs.png
+        22-apps-kipi-ipfs.png
+        32-apps-kipi-ipfs.png
+        48-apps-kipi-ipfs.png
+        sc-apps-kipi-ipfs.svgz
     DESTINATION ${ICON_INSTALL_DIR}
 )
