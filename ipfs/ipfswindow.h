@@ -61,15 +61,14 @@ public:
 
 public Q_SLOTS:
     /* UI callbacks */
-    void forgetButtonClicked();
     void slotUpload();
     void slotAnonUpload();
     void slotFinished();
     void slotCancel();
 
     /* IPFSGLOBALUPLOADAPI callbacks */
-    void apiAuthorized(bool success, const QString& username);
-    void apiAuthError(const QString& msg);
+/*     void apiAuthorized(bool success, const QString& username); */
+    /* void apiAuthError(const QString& msg); */
     void apiProgress(unsigned int percent, const IPFSGLOBALUPLOADAPIAction& action);
     void apiRequestPin(const QUrl& url);
     void apiSuccess(const IPFSGLOBALUPLOADAPIResult& result);
@@ -85,9 +84,6 @@ private:
 private:
     IPFSImagesList* list = nullptr;
     IPFSGLOBALUPLOADAPI*       api  = nullptr;
-    QPushButton*     forgetButton = nullptr;
-    QPushButton*     uploadAnonButton = nullptr;
-    QLabel*          userLabel = nullptr;
     /* Contains the ipfs username if API authorized.
      * If not, username is null. */
     QString          username;

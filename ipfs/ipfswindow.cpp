@@ -57,8 +57,7 @@ IPFSWindow::IPFSWindow(QWidget* const /*parent*/)
                         QString::fromLatin1(IMGUR_CLIENT_SECRET), this);
 
     /* Connect API signals */
-    connect(api, &IPFSGLOBALUPLOADAPI::authorized, this, &IPFSWindow::apiAuthorized);
-    connect(api, &IPFSGLOBALUPLOADAPI::authError,  this, &IPFSWindow::apiAuthError);
+
     connect(api, &IPFSGLOBALUPLOADAPI::progress,   this, &IPFSWindow::apiProgress);
     connect(api, &IPFSGLOBALUPLOADAPI::requestPin, this, &IPFSWindow::apiRequestPin);
     connect(api, &IPFSGLOBALUPLOADAPI::success,    this, &IPFSWindow::apiSuccess);
@@ -78,34 +77,17 @@ IPFSWindow::IPFSWindow(QWidget* const /*parent*/)
      * | <Not logged in> |
      * |     Forget      | */
 
-    auto* userLabelLabel = new QLabel(i18n("Custom Logged in as:"));
-    userLabelLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    userLabelLabel->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
 
-    this->userLabel = new QLabel; /* Label set in readSettings() */
-    userLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    userLabel->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
-
-    forgetButton = new QPushButton(i18n("Forget"));
 
     auto* authLayout = new QVBoxLayout;
     mainLayout->addLayout(authLayout);
-    authLayout->addWidget(userLabelLabel);
-    authLayout->addWidget(userLabel);
-    authLayout->addWidget(forgetButton);
+
     authLayout->insertStretch(-1, 1);
 
     /* Add anonymous upload button */
-    uploadAnonButton = new QPushButton(i18n("Custom Upload Anonymously"));
-    addButton(uploadAnonButton, QDialogButtonBox::ApplyRole);
-
     /* Connect UI signals */
-    connect(forgetButton, &QPushButton::clicked,
-            this, &IPFSWindow::forgetButtonClicked);
     connect(startButton(), &QPushButton::clicked,
             this, &IPFSWindow::slotUpload);
-    connect(uploadAnonButton, &QPushButton::clicked,
-            this, &IPFSWindow::slotAnonUpload);
     connect(this, &IPFSWindow::finished,
             this, &IPFSWindow::slotFinished);
     connect(this, &IPFSWindow::cancelClicked,
@@ -146,13 +128,6 @@ void IPFSWindow::reactivate()
 {
     list->loadImagesFromCurrentSelection();
     show();
-}
-
-void IPFSWindow::forgetButtonClicked()
-{
-    api->getAuth().unlink();
-
-    apiAuthorized(false, {});
 }
 
 void IPFSWindow::slotUpload()
@@ -197,28 +172,28 @@ void IPFSWindow::slotCancel()
     api->cancelAllWork();
 }
 
-void IPFSWindow::apiAuthorized(bool success, const QString& username)
-{
-    if (success)
-    {
-        this->username = username;
-        this->userLabel->setText(this->username);
-        this->forgetButton->setEnabled(true);
-        return;
-    }
+/* void IPFSWindow::apiAuthorized(bool success, const QString& username) */
+// {
+    // if (success)
+    // {
+        // this->username = username;
+        // this->userLabel->setText(this->username);
+        // this->forgetButton->setEnabled(true);
+        // return;
+    // }
+//
+    // this->username = QString();
+    // this->userLabel->setText(i18n("<Not logged in>"));
+    // this->forgetButton->setEnabled(false);
+/* } */
 
-    this->username = QString();
-    this->userLabel->setText(i18n("<Not logged in>"));
-    this->forgetButton->setEnabled(false);
-}
-
-void IPFSWindow::apiAuthError(const QString& msg)
-{
-    QMessageBox::critical(this,
-                          i18n("Authorization Failed"),
-                          i18n("Failed to log into IPFS: %1\n", msg));
-}
-
+/* void IPFSWindow::apiAuthError(const QString& msg) */
+// {
+    // QMessageBox::critical(this,
+                          // i18n("Authorization Failed"),
+                          // i18n("Failed to log into IPFS: %1\n", msg));
+// }
+/*  */
 void IPFSWindow::apiProgress(unsigned int /*percent*/, const IPFSGLOBALUPLOADAPIAction& action)
 {
     list->processing(QUrl::fromLocalFile(action.upload.imgpath));
@@ -277,7 +252,7 @@ void IPFSWindow::readSettings()
     KConfig config(QString::fromLatin1("kipirc"));
     KConfigGroup groupAuth = config.group("IPFS Auth");
     username = groupAuth.readEntry("username", QString());
-    apiAuthorized(!username.isEmpty(), username);
+    // apiAuthorized(!username.isEmpty(), username);
 
     winId();
     KConfigGroup groupDialog = config.group("IPFS Dialog");
