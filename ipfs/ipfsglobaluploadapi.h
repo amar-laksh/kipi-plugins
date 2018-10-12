@@ -3,10 +3,10 @@
  * This file is a part of KDE project
  *
  *
- * Date        : 2016-05-27
- * Description : Implementation of v3 of the IPFS API
+ * Date        : 2016-06-06
+ * Description : a kipi plugin to export images to the IPFS web service
  *
- * Copyright (C) 2016 by Fabian Vogt <fabian at ritter dash vogt dot de>
+ * Copyright (C) 2018 by Amar Lakshya <amar dot lakshya  at xaviers dot edu dot in>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General

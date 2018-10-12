@@ -6,8 +6,7 @@
  * Date        : 2016-06-06
  * Description : a kipi plugin to export images to the IPFS web service
  *
- * Copyright (C) 2010-2012 by Marius Orcsik <marius at habarnam dot ro>
- * Copyright (C) 2016 by Fabian Vogt <fabian at ritter dash vogt dot de>
+ * Copyright (C) 2018 by Amar Lakshya <amar dot lakshya  at xaviers dot edu dot in>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -124,19 +123,11 @@ IPFSWindow::IPFSWindow(QWidget* const /*parent*/)
 
     KPAboutData* const about = new KPAboutData(ki18n("IPFS Export"),
                                    ki18n("A tool to export images to IPFS web service"),
-                                   ki18n("(c) 2012-2013, Marius Orcsik"));
+                                   ki18n("(c) 2018, Amar Lakshya"));
 
-    about->addAuthor(ki18n("Marius Orcsik").toString(),
+    about->addAuthor(ki18n("Amar Lakshya").toString(),
                      ki18n("Author").toString(),
-                     QString::fromLatin1("marius at habarnam dot ro"));
-
-    about->addAuthor(ki18n("Gilles Caulier").toString(),
-                     ki18n("Developer").toString(),
-                     QString::fromLatin1("caulier dot gilles at gmail dot com"));
-
-    about->addAuthor(ki18n("Fabian Vogt").toString(),
-                     ki18n("Developer").toString(),
-                     QString::fromLatin1("fabian at ritter dash vogt dot de"));
+                     QString::fromLatin1("amar dot lakshya at xaviers dot edu dot in"));
 
     about->setHandbookEntry(QString::fromLatin1("tool-ipfsexport"));
     setAboutData(about);

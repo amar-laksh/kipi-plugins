@@ -1,12 +1,12 @@
 /* ============================================================
  *
  * This file is a part of KDE project
- * http://www.kipi-plugins.org
  *
- * Date        : 2010-02-04
- * Description : a tool to export images to ipfs.com
  *
- * Copyright (C) 2010-2012 by Marius Orcsik <marius at habarnam dot ro>
+ * Date        : 2016-06-06
+ * Description : a kipi plugin to export images to the IPFS web service
+ *
+ * Copyright (C) 2018 by Amar Lakshya <amar dot lakshya  at xaviers dot edu dot in>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -15,7 +15,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * ============================================================ */

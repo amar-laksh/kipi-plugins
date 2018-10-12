@@ -3,10 +3,10 @@
  * This file is a part of KDE project
  *
  *
- * Date        : 2016-05-27
- * Description : Implementation of v3 of the IPFS API
+ * Date        : 2016-06-06
+ * Description : a kipi plugin to export images to the IPFS web service
  *
- * Copyright (C) 2016 by Fabian Vogt <fabian at ritter dash vogt dot de>
+ * Copyright (C) 2018 by Amar Lakshya <amar dot lakshya  at xaviers dot edu dot in>
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General
@@ -42,7 +42,10 @@
 #include "o0settingsstore.h"
 #include "o0globals.h"
 
-static const QString ipfs_auth_url = QLatin1String("https://api.ipfs.com/oauth2/authorize"),
+static const QString ipfs_auth_url = QLatin1String("https://api.ipfs.com/oauth2/authorize");
+
+static const QString ipfs_upload_url = QLatin1String("https://api.globalupload.io/transport/add"),
+
 ipfs_token_url = QLatin1String("https://api.ipfs.com/oauth2/token");
 static const uint16_t ipfs_redirect_port = 8000; // Redirect URI is http://127.0.0.1:8000
 
@@ -316,19 +319,19 @@ void IPFSGLOBALUPLOADAPI::doWork()
             auto* multipart = new QHttpMultiPart(QHttpMultiPart::FormDataType, m_image);
             QHttpPart title;
             title.setHeader(QNetworkRequest::ContentDispositionHeader,
-                            QLatin1String("form-data; name=\"title\""));
+                            QLatin1String("form-data; name=\"keyphrase\""));
             title.setBody(work.upload.title.toUtf8().toPercentEncoding());
             multipart->append(title);
 
             QHttpPart description;
             description.setHeader(QNetworkRequest::ContentDispositionHeader,
-                                  QLatin1String("form-data; name=\"description\""));
+                                  QLatin1String("form-data; name=\"user\""));
             description.setBody(work.upload.description.toUtf8().toPercentEncoding());
             multipart->append(description);
 
             QHttpPart image;
             image.setHeader(QNetworkRequest::ContentDispositionHeader,
-                            QVariant(QString::fromLatin1("form-data; name=\"image\"; filename=\"%1\"")
+                            QVariant(QString::fromLatin1("form-data; file=\"%1\"")
                             .arg(QLatin1String(QFileInfo(work.upload.imgpath).fileName().toUtf8().toPercentEncoding()))));
             image.setHeader(QNetworkRequest::ContentTypeHeader, QLatin1String("application/octet-stream"));
             image.setBodyDevice(this->m_image);
