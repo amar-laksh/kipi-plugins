@@ -44,22 +44,17 @@
 #include "kpaboutdata.h"
 #include "kpversion.h"
 
-static const constexpr char *IMGUR_CLIENT_ID("bd2572bce74b73d"),
-                            *IMGUR_CLIENT_SECRET("300988683e99cb7b203a5889cf71de9ac891c1c1");
-
 namespace KIPIIPFSPlugin
 {
 
 IPFSWindow::IPFSWindow(QWidget* const /*parent*/)
     : KPToolDialog(0)
 {
-    api = new IPFSGLOBALUPLOADAPI(QString::fromLatin1(IMGUR_CLIENT_ID),
-                        QString::fromLatin1(IMGUR_CLIENT_SECRET), this);
+    api = new IPFSGLOBALUPLOADAPI(this);
 
     /* Connect API signals */
 
     connect(api, &IPFSGLOBALUPLOADAPI::progress,   this, &IPFSWindow::apiProgress);
-    connect(api, &IPFSGLOBALUPLOADAPI::requestPin, this, &IPFSWindow::apiRequestPin);
     connect(api, &IPFSGLOBALUPLOADAPI::success,    this, &IPFSWindow::apiSuccess);
     connect(api, &IPFSGLOBALUPLOADAPI::error,      this, &IPFSWindow::apiError);
     connect(api, &IPFSGLOBALUPLOADAPI::busy,       this, &IPFSWindow::apiBusy);
@@ -146,21 +141,6 @@ void IPFSWindow::slotUpload()
     }
 }
 
-void IPFSWindow::slotAnonUpload()
-{
-    QList<const IPFSImageListViewItem*> pending = this->list->getPendingItems();
-
-    for (auto item : pending)
-    {
-        IPFSGLOBALUPLOADAPIAction action;
-        action.type = IPFSGLOBALUPLOADAPIActionType::ANON_IMG_UPLOAD;
-        action.upload.imgpath = item->url().toLocalFile();
-        action.upload.title = item->Title();
-        action.upload.description = item->Description();
-
-        api->queueWork(action);
-    }
-}
 
 void IPFSWindow::slotFinished()
 {

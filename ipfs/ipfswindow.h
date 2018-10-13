@@ -62,7 +62,6 @@ public:
 public Q_SLOTS:
     /* UI callbacks */
     void slotUpload();
-    void slotAnonUpload();
     void slotFinished();
     void slotCancel();
 

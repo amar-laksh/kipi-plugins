@@ -41,9 +41,7 @@
 
 enum class IPFSGLOBALUPLOADAPIActionType
 {
-    ACCT_INFO, /* Action: account Result: account */
     IMG_UPLOAD, /* Action: upload Result: image */
-    ANON_IMG_UPLOAD, /* Action: upload Result: image */
 };
 
 struct IPFSGLOBALUPLOADAPIAction
@@ -55,11 +53,6 @@ struct IPFSGLOBALUPLOADAPIAction
         QString title;
         QString description;
     } upload;
-
-    struct
-    {
-        QString username;
-    } account;
 };
 
 struct IPFSGLOBALUPLOADAPIResult
@@ -69,54 +62,24 @@ struct IPFSGLOBALUPLOADAPIResult
     struct IPFSImage
     {
         QString    name;
-        QString    title;
-        QString    hash;
-        QString    deletehash;
         QString    url;
-        QString    description;
-        qulonglong datetime;
-        QString    type;
-        bool       animated;
-        uint       width;
-        uint       height;
         uint       size;
-        uint       views;
-        qulonglong bandwidth;
     } image;
-
-    struct IPFSAccount
-    {
-        QString username;
-    } account;
 };
 
-/* Main class, handles the client side of the IPFS API v3. */
+/* Main class, handles the client side of the globalupload.io API  */
 class IPFSGLOBALUPLOADAPI : public QObject
 {
 Q_OBJECT
 
 public:
-    IPFSGLOBALUPLOADAPI(const QString& client_id, const QString& client_secret, QObject* parent = nullptr);
+    IPFSGLOBALUPLOADAPI(QObject* parent = nullptr);
     ~IPFSGLOBALUPLOADAPI();
-
-    /* Use this to read/write the access and refresh tokens. */
-    O2 &getAuth();
-
     unsigned int workQueueLength();
     void queueWork(const IPFSGLOBALUPLOADAPIAction& action);
     void cancelAllWork();
 
-    static QUrl urlForDeletehash(const QString& deletehash);
-
 Q_SIGNALS:
-    /* Called if authentication state changes. */
-    void authorized(bool success, const QString& username);
-    void authError(const QString& msg);
-
-    /* Open url in a browser and let the user copy the pin.
-     * Call setPin(pin) to authorize. */
-    void requestPin(const QUrl& url);
-
     /* Emitted on progress changes. */
     void progress(unsigned int percent, const IPFSGLOBALUPLOADAPIAction& action);
     void success(const IPFSGLOBALUPLOADAPIResult& result);
@@ -126,13 +89,6 @@ Q_SIGNALS:
     void busy(bool b);
 
 public Q_SLOTS:
-    /* Connected to m_auth.linkedChanged(). */
-    void oauthAuthorized();
-    /* Connected to m_auth.openBrowser(QUrl). */
-    void oauthRequestPin(const QUrl& url);
-    /* Connected to m_auth.linkingFailed(). */
-    void oauthFailed();
-
     /* Connected to the current QNetworkReply. */
     void uploadProgress(qint64 sent, qint64 total);
     void replyFinished();
@@ -145,17 +101,10 @@ private:
     void startWorkTimer();
     /* Stops m_work_timer if running. */
     void stopWorkTimer();
-    /* Adds the user authorization info to the request. */
-    void addAuthToken(QNetworkRequest* request);
-    /* Adds the client authorization info to the request. */
-    void addAnonToken(QNetworkRequest* request);
 
     /* Start working on the first item of m_work_queue
      * by sending a request. */
     void doWork();
-
-    /* Handler for OAuth 2 related requests. */
-    O2 m_auth;
 
     /* Work queue. */
     std::queue<IPFSGLOBALUPLOADAPIAction> m_work_queue;
